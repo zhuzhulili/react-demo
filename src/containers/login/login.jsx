@@ -1,8 +1,17 @@
 import React, { Component } from 'react'
 import { Form,Icon,Input,Button } from "antd";
+import qs from 'qs'
+import {connect} from 'react-redux'
+import {Redirect} from 'react-router-dom'
 
 import logo from "./images/logo.png";
 import './login.less';
+import {loginAsync} from '../../redux/action-creators/user'
+ @connect(
+   state=>({hasLogin:state.user.hasLogin}),
+   {loginAsync}
+ )
+ @Form.create()
  class Login extends Component {
   validatepwd=(rule, value, callback)=>{
     if(value===''){
@@ -17,16 +26,29 @@ import './login.less';
     else{
       callback()
     }
-  }
+  }  
+
+// ajax
+
   handleSubmit=(event)=>{
     event.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('发送Ajax请求! ', values);
+        const {username,password}= values
+        console.log('发送Ajax请求! ', username,password);
+        this.props.loginAsync(username,password)
+         
+      }else{
+
       }
     });
   }
   render() {
+    
+    const {hasLogin}=this.props
+    if(hasLogin){
+      return <Redirect to='/'/>
+    }
     const { getFieldDecorator } = this.props.form;
     return (
       <div className='login'>
@@ -76,5 +98,4 @@ import './login.less';
     )
   }
 }
-const Loginwarp=Form.create()(Login)
-export default Loginwarp
+export default Login 
