@@ -5,13 +5,15 @@ import {connect} from 'react-redux'
 import {Redirect} from 'react-router-dom'
 
 import logo from "./images/logo.png";
-import './login.less';
+import './index.less';
 import {loginAsync} from '../../redux/action-creators/user'
+import WithCheckLogin from "../with-check-login";
  @connect(
-   state=>({hasLogin:state.user.hasLogin}),
+   state=>({}),
    {loginAsync}
  )
  @Form.create()
+ @WithCheckLogin
  class Login extends Component {
   validatepwd=(rule, value, callback)=>{
     if(value===''){
@@ -45,10 +47,7 @@ import {loginAsync} from '../../redux/action-creators/user'
   }
   render() {
     
-    const {hasLogin}=this.props
-    if(hasLogin){
-      return <Redirect to='/'/>
-    }
+     
     const { getFieldDecorator } = this.props.form;
     return (
       <div className='login'>

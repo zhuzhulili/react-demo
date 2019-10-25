@@ -6,3 +6,8 @@ export const reqLogin=({username, password})=>ajax({
   data:{username,password}
 
 })
+
+export const reqUsers=()=>ajax({
+  url:'/manage/user/list',
+  method:'GET'
+})
