@@ -2,18 +2,49 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import {withRouter} from 'react-router-dom'
 import dayjs from 'dayjs'
+import { Modal, Button, Icon}from 'antd'
+import screenfull from "screenfull";
 
 import LinkButton from "../../../components/link-button";
 import './index.less'
- @connect(state=>({username:state.user.user.username}))
+import {removeUserToken} from '../../../redux/action-creators/user'
+import {reqWeather} from '../../../api'
+ @connect(state=>({username:state.user.user.username,
+  headerTitle: state.headerTitle
+}),
+ {removeUserToken}
+ )
+
  @withRouter // 向组件内部传入3个属性: history/location/match
  class Header extends Component {
  state={
-   currentTime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-
+   currentTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+   dayPictureUrl: '',
+   weather: '',
+   isFullScreen: false,
+ }
+ handleFullScreen=()=>{
+  if (screenfull.isEnabled) {
+    screenfull.toggle()
+  }
  }
  logout = () => {
-  alert('logout')
+  Modal.confirm({
+    title: '确认退出吗?',
+    onOk:() => {
+      this.props.removeUserToken()
+    },
+    onCancel() {
+      console.log('Cancel');
+    },
+  })
+} 
+showWeather=async()=>{
+  const {dayPictureUrl, weather}=await reqWeather('北京')
+  this.setState({
+    dayPictureUrl, 
+    weather
+  })
 }
  componentDidMount(){
    this.intervalId=setInterval(() => {
@@ -21,25 +52,34 @@ import './index.less'
        currentTime:dayjs().format('YYYY-MM-DD HH:mm:ss')
      })
    }, 1000);
+   this.showWeather()
+   screenfull.onchange(()=>{
+     this.setState({
+       isFullScreen:!this.state.isFullScreen
+     })
+   })
  }
  componentWillUnmount(){
    clearInterval(this.intervalId)
  }
   render() {
-    const path = this.props.location.pathname
-    const {currentTime}=this.state
+     const { username,headerTitle} = this.props
+    const {currentTime,dayPictureUrl,weather,isFullScreen}=this.state
     return (
       <div className='header'>
         <div className='header-top'>
-          <span>欢迎,{this.props.username}</span>
+          <Button size='small' onClick={this.handleFullScreen}>
+          <Icon type={isFullScreen ? 'fullscreen-exit': 'fullscreen'} />
+          </Button> &nbsp;
+          <span>欢迎,{username}</span>
           <LinkButton onClick={this.logout}>退出</LinkButton>
         </div>
         <div className='header-bottom'>
-             <div className='header-bottom-left'>{path}</div>
+             <div className='header-bottom-left'>{headerTitle}</div>
              <div className='header-bottom-right'>
              <span>{currentTime}</span>
-            <img src="http://api.map.baidu.com/images/weather/day/xiaoyu.png" alt="weather"/>
-            <span>小雨转多云</span>
+            <img src={dayPictureUrl} alt="weather"/>
+            <span>{weather}</span>
              </div>
             
         </div>

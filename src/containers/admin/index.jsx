@@ -15,6 +15,9 @@ import Category from '../category'
 import Product from '../product'
 import Role from '../role'
 import User from '../user'
+import AddUpdate from '../product/add-update'
+import Detail from '../product/detail'
+import List from '../product/index'
 
 const { Header, Footer, Sider, Content } = Layout
 @WithCheckLogin
@@ -31,8 +34,10 @@ const { Header, Footer, Sider, Content } = Layout
       <Content style={{backgroundColor:'white', margin:'30px 15px 0 15px'}}>
         <Switch>
           <Route path='/home' component={Home}/>
-          <Route path='/category' component={Category}/>
-          <Route path='/product' component={Product}/>
+          <Route path='/category' component={Category} exact/>
+          <Route path='/product' component={List} exact/>
+          <Route path='/product/detail/:id' component={Detail}/>
+          <Route path='/product/addupdate' component={AddUpdate}/>
           <Route path='/role' component={Role}/>
           <Route path='/user' component={User}/>
           <Route path='/charts/line' component={Line}/>
